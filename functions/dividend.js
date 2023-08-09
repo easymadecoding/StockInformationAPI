@@ -11,7 +11,8 @@ router.get('/', (req, res) => {
 })
 
 
-router.get('/dividend/:symbol', (req, res) => {
+router.get('/:symbol', (req, res) => {
+    
     const symbol = req.params.symbol
 
     const url = 'https://www.streetinsider.com/dividend_history.php?q='
@@ -50,6 +51,6 @@ router.get('/dividend/:symbol', (req, res) => {
         }).catch(err => console.log(err))
 })
 
-app.use('/.netlify/functions/index', router)
+app.use('/.netlify/functions/dividend', router)
 
 module.exports.handler=serverless(app)
