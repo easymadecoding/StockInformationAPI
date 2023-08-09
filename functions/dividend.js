@@ -39,7 +39,7 @@ router.get('/:symbol', (req, res) => {
                     Amount: JSON.stringify(dividendData[i+1]).split(':')[1].slice(1,-2),
                     DeclarationDate: JSON.stringify(dividendData[i+5]).split(':')[1].slice(1,-2),
                     RecordDate: JSON.stringify(dividendData[i+6]).split(':')[1].slice(1,-2),
-                    PaymanetDate: JSON.stringify(dividendData[i+7]).split(':')[1].slice(1,-2),
+                    PaymentDate: JSON.stringify(dividendData[i+7]).split(':')[1].slice(1,-2),
                 }
 
                 parsedData.push(dividend)
