@@ -1,5 +1,6 @@
 const PORT = process.env.PORT || 8000
 const express = require('express')
+const serverless = require('serverless-http')
 const axios = require('axios')
 const cheerio = require('cheerio')
 const app = express()
@@ -49,3 +50,5 @@ app.get('/dividend/:symbol', (req, res) => {
 })
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`))
+
+module.exports.handler=serverless(app)
