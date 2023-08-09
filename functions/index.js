@@ -4,13 +4,14 @@ const serverless = require('serverless-http')
 const axios = require('axios')
 const cheerio = require('cheerio')
 const app = express()
+const router = express.Router();
 
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     res.json('Welcome to the stock dividend API')
 })
 
 
-app.get('/dividend/:symbol', (req, res) => {
+router.get('/dividend/:symbol', (req, res) => {
     const symbol = req.params.symbol
 
     const url = 'https://www.streetinsider.com/dividend_history.php?q='
@@ -49,6 +50,6 @@ app.get('/dividend/:symbol', (req, res) => {
         }).catch(err => console.log(err))
 })
 
-app.listen(PORT, () => console.log(`server running on PORT ${PORT}`))
+app.use('/.netlify/functions/index', router)
 
 module.exports.handler=serverless(app)
