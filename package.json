@@ -4,6 +4,7 @@
   "description": "An API that return dividends for a certain symbol",
   "main": "index.js",
   "scripts": {
+    "build": "netlify deploy --prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
