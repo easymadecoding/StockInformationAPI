@@ -1,4 +1,3 @@
-const PORT = process.env.PORT || 8000
 const express = require('express')
 const serverless = require('serverless-http')
 const axios = require('axios')
@@ -51,6 +50,6 @@ router.get('/:symbol', (req, res) => {
         }).catch(err => console.log(err))
 })
 
-app.use('/dividendInformation', router)
+app.use('/.netlify/functions/dividend', router)
 
 module.exports.handler=serverless(app)
