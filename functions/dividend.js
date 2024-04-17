@@ -69,6 +69,8 @@ router.get('/value/:symbol/:startDate/:endDate', (req, res) => {
 
     const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestamp(endDate);
 
+    console.log('Url: ', url);
+
 
     axios.get(url)
         .then(response => {
