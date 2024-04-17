@@ -4,7 +4,19 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const app = express()
 const router = express.Router();
-const dateToUnixTimestamp = require('../helpers.js');
+
+function dateToUnixTimestamp(dateString) {
+
+    const [day, month, year] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    const unixTimestamp = Math.floor(date.getTime() / 1000);
+
+    return unixTimestamp;
+}
+
+const dateString = '23-10-1990';
+const unixTimestamp = dateToUnixTimestamp(dateString);
+
 
 router.get('/', (req, res) => {
     res.json('Welcome to the stock information API')
