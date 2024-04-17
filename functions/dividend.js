@@ -4,6 +4,7 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const app = express()
 const router = express.Router();
+const dateToUnixTimestamp = require('../helpers.js');
 
 router.get('/', (req, res) => {
     res.json('Welcome to the stock information API')
