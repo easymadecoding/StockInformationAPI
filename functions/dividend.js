@@ -63,53 +63,59 @@ router.get('/:symbol', (req, res) => {
         }).catch(err => console.log(err))
 })
 
-router.get('/value/:symbol/:startDate/:endDate', (req, res) => {
+router.get('/:symbol/:startDate/:endDate', async (req, res) => {
     
-    const { symbol, startDate, endDate } = req.params;
+    try{
+        var startDateValue = 0;
+        var endDateValue = 0;
+        var result = 0.0;
 
-    const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestamp(endDate);
+        const { symbol, startDate, endDate } = req.params;
 
-    console.log('Url: ', url);
+        const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestamp(endDate);
+    
+        console.log('Url: ', url);
+    
+        const response = await axios.get(url);
+        const html = response.data;
+    
+        const $ = cheerio.load(html);
+
+        console.log('$: ', $);
 
 
-    axios.get(url)
-        .then(response => {
-            const html = response.data
-            const $ = cheerio.load(html)
-            var startDateValue = 0;
-            var endDateValue = 0;
-            var result = 0.0;
+        $('tbody tr.svelte-ta1t6m').each((index, element) => {
+            const row = $(element);
+        
+            const dateCell = row.find('td:nth-child(1)').text();
 
+            console.log('Date Cell:', dateCell);
 
-            $('tbody tr.svelte-ta1t6m').each((index, element) => {
-                const row = $(element);
-            
-                const dateCell = row.find('td:nth-child(1)').text();
+            if (dateCell == startDate) {
 
-                console.log('Date Cell:', dateCell);
+                startDateValue = row.find('td:nth-child(2)').text();
+                console.log('Start Date Value:', startDateValue);
+            }
 
-                if (dateCell == startDate) {
-
-                    startDateValue = row.find('td:nth-child(2)').text();
-                    console.log('Start Date Value:', startDateValue);
+            if (dateCell === endDate) {
+                endDateValue = parseFloat(row.find('td:nth-child(2)').text());
+                console.log('End Date Value:', endDateValue);
+        
+                if (startDateValue !== undefined) {
+                    result = ((endDateValue - startDateValue) / startDateValue) * 100;
+                    console.log('Percentage Return:', result.toFixed(2) + '%');
+                } else {
+                    console.log('Start date not found.');
                 }
+            }
+        });
 
-                if (dateCell === endDate) {
-                    endDateValue = parseFloat(row.find('td:nth-child(2)').text());
-                    console.log('End Date Value:', endDateValue);
-            
-                    if (startDateValue !== undefined) {
-                        result = ((endDateValue - startDateValue) / startDateValue) * 100;
-                        console.log('Percentage Return:', result.toFixed(2) + '%');
-                    } else {
-                        console.log('Start date not found.');
-                    }
-                }
-            });
+        res.json(result)
 
-            res.json(result)
-
-        }).catch(err => console.log(err))
+    } catch(error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
 })
 
 app.use('/.netlify/functions/dividend', router)
