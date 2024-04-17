@@ -84,6 +84,8 @@ router.get('/value/:symbol/:startDate/:endDate', (req, res) => {
             
                 const dateCell = row.find('td:nth-child(1)').text();
 
+                console.log('Date Cell:', dateCell);
+
                 if (dateCell == startDate) {
 
                     startDateValue = row.find('td:nth-child(2)').text();
