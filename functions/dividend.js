@@ -4,6 +4,9 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const app = express()
 const router = express.Router();
+const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+}
 
 function dateToUnixTimestamp(dateString) {
 
@@ -29,13 +32,15 @@ router.get('/:symbol/:startDate/:endDate', async (req, res) => {
         var endDateValue = 0;
         var result = 0.0;
 
+        console.log('Start: ');
+
         const { symbol, startDate, endDate } = req.params;
 
         const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestamp(endDate);
     
         console.log('Url: ', url);
     
-        const response = await axios.get(url);
+        const response = await axios.get(url, {headers,});
         const html = response.data;
     
         const $ = cheerio.load(html);
@@ -121,3 +126,4 @@ router.get('/:symbol', (req, res) => {
 app.use('/.netlify/functions/dividend', router)
 
 module.exports.handler=serverless(app)
+module.exports = router;
