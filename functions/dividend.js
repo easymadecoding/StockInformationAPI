@@ -127,7 +127,7 @@ router.get('/dividend/:symbol', (req, res) => {
         }).catch(err => console.log(err))
 })
 
-app.use('/.netlify/functions', router)
+app.use('/.netlify/functions/dividend', router)
 
 module.exports.handler=serverless(app)
 
