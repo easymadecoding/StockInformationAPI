@@ -71,7 +71,7 @@ router.get('/return/:symbol/:startDate/:endDate', async (req, res) => {
             if (startDateValue !== 0 && endDateValue !== 0) {
                 result = ((endDateValue - startDateValue) / startDateValue) * 100;
                 console.log('Percentage Return:', result.toFixed(2) + '%');
-                res.json(result);
+                res.json(result.toFixed(2));
             } else {
                 console.log('Start date or end date not found.');
                 res.status(404).send('Start date or end date not found.');
@@ -127,9 +127,14 @@ router.get('/dividend/:symbol', (req, res) => {
         }).catch(err => console.log(err))
 })
 
-app.use('/.netlify/functions/dividend', router)
+app.use('/.netlify/functions/stockinformation', router)
 
 module.exports.handler=serverless(app)
 
 //remove commented code from below for local testing
 //module.exports = router;
+
+//TO-DO: 
+
+//1. Refactor
+//2. Handle weekend cases
