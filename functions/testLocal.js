@@ -1,6 +1,5 @@
 const express = require('express');
-const serverless = require('serverless-http');
-const router = require('./dividend'); 
+const router = require('./stockinformation'); 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
