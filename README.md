@@ -1,4 +1,4 @@
-# DividendAPI
+# Stock Information API
 API to get dividend history for a symbol
 
 The API is deployed live at: https://dividendapi.netlify.app/.netlify/functions/stockinformation
