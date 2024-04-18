@@ -34,6 +34,45 @@ function formatDateToMatchApiArgument(dateString) {
     return `${day}-${month}-${year}`;
 }
 
+function getLastFridayOrNonHolidayDate(dateString) {
+
+    const holidays = [
+      '01-01', // New Year's Day
+      '01-15', // Martin Luther King, Jr. Day
+      '02-19', // Washington's Birthday
+      '03-29', // Good Friday
+      '05-27', // Memorial Day
+      '06-19', // Juneteenth National Independence Day
+      '07-04', // Independence Day
+      '09-02', // Labor Day
+      '11-28', // Thanksgiving Day
+      '12-25'  // Christmas Day
+    ];
+  
+    const parts = dateString.split('-');
+    const day = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const year = parseInt(parts[2]);
+    
+    const date = new Date(year, month, day);
+  
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      const lastFriday = new Date(date);
+      lastFriday.setDate(date.getDate() - (dayOfWeek === 0 ? 2 : 1));
+      const formattedLastFriday = `${lastFriday.getDate().toString().padStart(2, '0')}-${(lastFriday.getMonth() + 1).toString().padStart(2, '0')}-${lastFriday.getFullYear()}`;
+      return formattedLastFriday;
+    } else if (holidays.includes((month + 1).toString().padStart(2, '0') + '-' + day.toString().padStart(2, '0'))) {
+      const lastFriday = new Date(date);
+      lastFriday.setDate(date.getDate() - 1);
+      const formattedLastFriday = `${lastFriday.getDate().toString().padStart(2, '0')}-${(lastFriday.getMonth() + 1).toString().padStart(2, '0')}-${lastFriday.getFullYear()}`;
+      return formattedLastFriday;
+    } else {
+      return dateString;
+    }
+  }
+  
+
 router.get('/', (req, res) => {
     res.json('Welcome to the stock information API')
 })
@@ -45,7 +84,10 @@ router.get('/return/:symbol/:startDate/:endDate', async (req, res) => {
         var endDateValue = 0;
         var result = 0.0;
 
-        const { symbol, startDate, endDate } = req.params;
+        const { symbol, firstDate, secondDate } = req.params;
+
+        var startDate = getLastFridayOrNonHolidayDate(firstDate);
+        var endDate = getLastFridayOrNonHolidayDate(secondDate);
 
         const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestampPlusADay(endDate);
     
