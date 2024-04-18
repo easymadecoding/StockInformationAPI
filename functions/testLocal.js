@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use('/.netlify/functions/dividend', router);
+app.use('/.netlify/functions/stockinformation', router);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

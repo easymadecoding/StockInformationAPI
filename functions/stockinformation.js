@@ -13,7 +13,6 @@ function dateToUnixTimestamp(dateString) {
     const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
     const unixTimestamp = Math.floor(date.getTime() / 1000); 
 
-    console.log(dateString + " " + unixTimestamp)
     return unixTimestamp;
 }
 
@@ -22,7 +21,6 @@ function dateToUnixTimestampPlusADay(dateString) {
     const date = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0)); 
     const unixTimestamp = Math.floor(date.getTime() / 1000); 
 
-    console.log(dateString + " " + unixTimestamp)
     return unixTimestamp;
 }
 
@@ -77,7 +75,7 @@ router.get('/', (req, res) => {
     res.json('Welcome to the stock information API')
 })
 
-router.get('/return/:symbol/:startDate/:endDate', async (req, res) => {
+router.get('/return/:symbol/:firstDate/:secondDate', async (req, res) => {
     
     try{
         var startDateValue = 0;
