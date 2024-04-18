@@ -127,5 +127,5 @@ app.use('/.netlify/functions/stockinformation', router)
 module.exports.handler=serverless(app)
 
 //remove commented code from below for local testing
-module.exports = router;
+//module.exports = router;
 
