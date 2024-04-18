@@ -5,76 +5,80 @@ const cheerio = require('cheerio')
 const app = express()
 const router = express.Router();
 const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
 }
 
 function dateToUnixTimestamp(dateString) {
-
     const [day, month, year] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    const unixTimestamp = Math.floor(date.getTime() / 1000);
+    const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+    const unixTimestamp = Math.floor(date.getTime() / 1000); 
 
+    console.log(dateString + " " + unixTimestamp)
     return unixTimestamp;
 }
 
-const dateString = '23-10-1990';
-const unixTimestamp = dateToUnixTimestamp(dateString);
+function dateToUnixTimestampPlusADay(dateString) {
+    const [day, month, year] = dateString.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0)); 
+    const unixTimestamp = Math.floor(date.getTime() / 1000); 
 
+    console.log(dateString + " " + unixTimestamp)
+    return unixTimestamp;
+}
+
+function formatDateToMatchApiArgument(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${day}-${month}-${year}`;
+}
 
 router.get('/', (req, res) => {
     res.json('Welcome to the stock information API')
 })
 
-router.get('/:symbol/:startDate/:endDate', async (req, res) => {
+router.get('/return/:symbol/:startDate/:endDate', async (req, res) => {
     
     try{
         var startDateValue = 0;
         var endDateValue = 0;
         var result = 0.0;
 
-        console.log('Start: ');
-
         const { symbol, startDate, endDate } = req.params;
 
-        const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestamp(endDate);
-    
-        console.log('Url: ', url);
+        const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestampPlusADay(endDate);
     
         const response = await axios.get(url, {headers,});
         const html = response.data;
     
         const $ = cheerio.load(html);
 
-        console.log('$: ', $);
+        const processRows = () => {
+            $('tbody tr.svelte-ta1t6m').each((index, element) => {
+                const row = $(element);
+                const dateCell = row.find('td:nth-child(1)').text();
 
-
-        $('tbody tr.svelte-ta1t6m').each((index, element) => {
-            const row = $(element);
-        
-            const dateCell = row.find('td:nth-child(1)').text();
-
-            console.log('Date Cell:', dateCell);
-
-            if (dateCell == startDate) {
-
-                startDateValue = row.find('td:nth-child(2)').text();
-                console.log('Start Date Value:', startDateValue);
-            }
-
-            if (dateCell === endDate) {
-                endDateValue = parseFloat(row.find('td:nth-child(2)').text());
-                console.log('End Date Value:', endDateValue);
-        
-                if (startDateValue !== undefined) {
-                    result = ((endDateValue - startDateValue) / startDateValue) * 100;
-                    console.log('Percentage Return:', result.toFixed(2) + '%');
-                } else {
-                    console.log('Start date not found.');
+                if (formatDateToMatchApiArgument(dateCell) == startDate) {
+                    startDateValue = parseFloat(row.find('td:nth-child(2)').text());
                 }
-            }
-        });
 
-        res.json(result)
+                if (formatDateToMatchApiArgument(dateCell) === endDate) {
+                    endDateValue = parseFloat(row.find('td:nth-child(2)').text());
+                }
+            });
+
+            if (startDateValue !== 0 && endDateValue !== 0) {
+                result = ((endDateValue - startDateValue) / startDateValue) * 100;
+                console.log('Percentage Return:', result.toFixed(2) + '%');
+                res.json(result);
+            } else {
+                console.log('Start date or end date not found.');
+                res.status(404).send('Start date or end date not found.');
+            }
+        };
+
+        processRows();
 
     } catch(error) {
         console.error('Error:', error);
@@ -83,7 +87,7 @@ router.get('/:symbol/:startDate/:endDate', async (req, res) => {
 })
 
 
-router.get('/:symbol', (req, res) => {
+router.get('/dividend/:symbol', (req, res) => {
     
     const symbol = req.params.symbol
 
