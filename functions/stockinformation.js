@@ -28,14 +28,14 @@ router.get('/return/:symbol/:firstDate/:secondDate', async (req, res) => {
         var endDate = getLastFridayOrNonHolidayDate(secondDate);
 
         const url = 'https://finance.yahoo.com/quote/' + symbol + '/history/?period1=' + dateToUnixTimestamp(startDate) +'&period2=' + dateToUnixTimestampPlusADay(endDate);
-    
+
         const response = await axios.get(url, {headers,});
         const html = response.data;
     
         const $ = cheerio.load(html);
 
         const processRows = () => {
-            $('tbody tr.svelte-ta1t6m').each((index, element) => {
+            $('tbody tr.svelte-ewueuo').each((index, element) => {
                 const row = $(element);
                 const dateCell = row.find('td:nth-child(1)').text();
 
@@ -50,7 +50,6 @@ router.get('/return/:symbol/:firstDate/:secondDate', async (req, res) => {
 
             if (startDateValue !== 0 && endDateValue !== 0) {
                 result = ((endDateValue - startDateValue) / startDateValue) * 100;
-                console.log('Percentage Return:', result.toFixed(2) + '%');
                 res.json(result.toFixed(2));
             } else {
                 console.log('Start date or end date not found.');
@@ -127,5 +126,5 @@ app.use('/.netlify/functions/stockinformation', router)
 module.exports.handler=serverless(app)
 
 //remove commented code from below for local testing
-//module.exports = router;
+module.exports = router;
 
